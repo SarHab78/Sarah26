@@ -12,46 +12,48 @@ window.PUZZLE = {
 
   categories: [
     {
-      /* keyboard · keystone · keynote — KEY wants to be here */
+      /* Deliberately NOT groceries, so every food word on the board falls
+         through to money slang or bands instead. GOLD pulls toward money. */
+      id: "costco",
+      name: "ONLY AT COSTCO",
+      color: "#F0B429",
+      words: ["ROTISSERIE", "CHURRO", "PALLET", "SAMPLES", "GOLD", "CASKET", "KIRKLAND"],
+    },
+    {
+      /* All six are things Costco sells - the pull runs both directions */
+      id: "beach",
+      name: "IN THE BEACH BAG",
+      color: "#3FA7A0",
+      words: ["TOWEL", "SUNSCREEN", "UMBRELLA", "COOLER", "FRISBEE", "SANDALS", "CHAIR"],
+    },
+    {
+      /* Every one is food-sounding. BREAD is the cruel one: real band AND
+         classic money slang - only the 6-slot constraint resolves it. */
+      id: "bands",
+      name: "ACTUALLY BANDS",
+      color: "#A86FD1",
+      words: ["GARBAGE", "CAKE", "CREAM", "BREAD", "PULP", "KORN", "TOTO"],
+    },
+    {
+      /* Reads as a Costco grocery run; CLAMS reads as beach */
+      id: "money",
+      name: "SLANG FOR MONEY",
+      color: "#7FB069",
+      words: ["BACON", "CHEDDAR", "LETTUCE", "CABBAGE", "DOUGH", "CLAMS", "SCRATCH"],
+    },
+    {
+      /* BLUE and POKER pull toward money, TORTILLA and CHOCOLATE toward Costco */
+      id: "chips",
+      name: "KINDS OF CHIPS",
+      color: "#5B8FD9",
+      words: ["BLUE", "POKER", "WOOD", "MICRO", "TORTILLA", "CHOCOLATE", "PAINT"],
+    },
+    {
+      /* Steals the two most obvious beach words; BILL and CARD pull money */
       id: "board",
       name: "___ BOARD",
-      color: "#F0B429",
-      words: ["SKATE", "DASH", "SURF", "BILL", "CHALK", "CARD", "SPRING"],
-    },
-    {
-      /* limelight vs limestone · moonlight vs moonstone */
-      id: "light",
-      name: "___ LIGHT",
-      color: "#7FB069",
-      words: ["MOON", "SPOT", "DAY", "SEARCH", "LIME", "HIGH", "SUN"],
-    },
-    {
-      /* cornerstone vs cornerback · keystone vs keyboard */
-      id: "stone",
-      name: "___ STONE",
-      color: "#5B8FD9",
-      words: ["BRIM", "CORNER", "MILE", "GRAVE", "SAND", "KEY", "FLINT"],
-    },
-    {
-      /* the gentle way in — every puzzle needs one */
-      id: "work",
-      name: "___ WORK",
-      color: "#A86FD1",
-      words: ["NET", "HOME", "TEAM", "FRAME", "PATCH", "CLOCK", "GROUND"],
-    },
-    {
-      /* paperback vs paperwork vs paperboard — PAPER pulls three ways */
-      id: "back",
-      name: "___ BACK",
-      color: "#3FA7A0",
-      words: ["FLASH", "GREEN", "PAPER", "DRAW", "SET", "FEED", "QUARTER"],
-    },
-    {
-      /* firefly vs firework · horsefly vs horseback · housefly vs housework */
-      id: "fly",
-      name: "___ FLY",
       color: "#E8795A",
-      words: ["BUTTER", "FIRE", "DRAGON", "HORSE", "MAY", "HOUSE", "BAR"],
+      words: ["SURF", "BOOGIE", "SKATE", "CHALK", "CARD", "BILL", "DASH"],
     },
   ],
 };
