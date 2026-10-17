@@ -280,15 +280,12 @@
     $grid.classList.add("shake");
     setTimeout(function(){ $grid.classList.remove("shake"); }, 420);
     render();
-    if(best === sel.length - 1){
-      $msg.textContent = "So close — one of these doesn't belong.";
-      $msg.className = "msg hot";
-    } else {
-      $msg.textContent = best <= 1
-        ? "Not a team — those don't go together."
-        : "Not a team. " + best + " of those " + sel.length + " belong together.";
-      $msg.className = "msg hot";
-    }
+    /* Only the classic "one away" is worth saying out loud. An exact count
+       on every miss turns the board into a solver and kills the puzzle. */
+    $msg.textContent = (best === sel.length - 1)
+      ? "So close — one of these doesn't belong."
+      : "Not a team. Look again.";
+    $msg.className = "msg hot";
   };
 
   render();

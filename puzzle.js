@@ -12,40 +12,46 @@ window.PUZZLE = {
 
   categories: [
     {
+      /* keyboard · keystone · keynote — KEY wants to be here */
+      id: "board",
+      name: "___ BOARD",
+      color: "#F0B429",
+      words: ["SKATE", "DASH", "SURF", "BILL", "CHALK", "CARD", "SPRING"],
+    },
+    {
+      /* limelight vs limestone · moonlight vs moonstone */
       id: "light",
       name: "___ LIGHT",
-      color: "#F0B429",
-      words: ["MOON", "FLASH", "SPOT", "HIGH", "DAY", "STAR", "LAMP"],
-    },
-    {
-      id: "pasta",
-      name: "PASTA SHAPES",
       color: "#7FB069",
-      words: ["PENNE", "ORZO", "FARFALLE", "RIGATONI", "ZITI", "FUSILLI", "ROTINI"],
+      words: ["MOON", "SPOT", "DAY", "SEARCH", "LIME", "HIGH", "SUN"],
     },
     {
-      id: "greek",
-      name: "GREEK LETTERS",
+      /* cornerstone vs cornerback · keystone vs keyboard */
+      id: "stone",
+      name: "___ STONE",
       color: "#5B8FD9",
-      words: ["BETA", "GAMMA", "OMEGA", "THETA", "KAPPA", "LAMBDA", "SIGMA"],
+      words: ["BRIM", "CORNER", "MILE", "GRAVE", "SAND", "KEY", "FLINT"],
     },
     {
-      id: "nato",
-      name: "NATO ALPHABET",
+      /* the gentle way in — every puzzle needs one */
+      id: "work",
+      name: "___ WORK",
       color: "#A86FD1",
-      words: ["TANGO", "FOXTROT", "ROMEO", "JULIET", "WHISKEY", "QUEBEC", "YANKEE"],
+      words: ["NET", "HOME", "TEAM", "FRAME", "PATCH", "CLOCK", "GROUND"],
     },
     {
-      id: "blue",
-      name: "SHADES OF BLUE",
+      /* paperback vs paperwork vs paperboard — PAPER pulls three ways */
+      id: "back",
+      name: "___ BACK",
       color: "#3FA7A0",
-      words: ["NAVY", "TEAL", "COBALT", "AZURE", "INDIGO", "PERIWINKLE", "CERULEAN"],
+      words: ["FLASH", "GREEN", "PAPER", "DRAW", "SET", "FEED", "QUARTER"],
     },
     {
-      id: "cards",
-      name: "CARD GAMES",
+      /* firefly vs firework · horsefly vs horseback · housefly vs housework */
+      id: "fly",
+      name: "___ FLY",
       color: "#E8795A",
-      words: ["HEARTS", "SPADES", "RUMMY", "BRIDGE", "SOLITAIRE", "CRIBBAGE", "CANASTA"],
+      words: ["BUTTER", "FIRE", "DRAGON", "HORSE", "MAY", "HOUSE", "BAR"],
     },
   ],
 };
