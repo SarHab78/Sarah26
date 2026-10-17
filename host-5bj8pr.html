@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Host — Find Your People</title>
+<style>
+  :root{--bg:#faf7f2;--surface:#fff;--ink:#1c1a17;--muted:#6c655c;--line:#ded3c4}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);padding:0 16px 80px;
+    font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:24px;margin:26px 0 4px}
+  h2{font-size:14px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+     margin:32px 0 10px;border-top:1px solid var(--line);padding-top:16px}
+  p.note{color:var(--muted);font-size:14px;line-height:1.5;margin:6px 0 0}
+  textarea,input{font:inherit;width:100%;background:var(--surface);color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;padding:12px}
+  textarea{min-height:190px;resize:vertical;line-height:1.5}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  button{appearance:none;border:0;font:inherit;font-weight:700;background:var(--ink);color:var(--bg);
+    padding:11px 18px;border-radius:999px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  button:active{transform:scale(.98)}
+  .count{color:var(--muted);font-size:14px}
+  .count.bad{color:#c0392b;font-weight:700}
+  .link{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+    display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:10px}
+  .link code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;word-break:break-all}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}
+  td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  td.w{font-weight:800}
+  td.act{width:1%;white-space:nowrap}
+  td.act button{font-size:12px;padding:6px 12px;font-weight:700}
+  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800;color:#1c1a17}
+  .keycard{border-radius:14px;padding:13px 15px;margin-bottom:8px;color:#1c1a17}
+  .keycard .n{font-weight:800;font-size:16px}
+  .keycard .ws{font-size:13px;font-weight:600;opacity:.85;margin-top:3px;line-height:1.5}
+  .keycard .ppl{font-size:13px;margin-top:7px;line-height:1.6;background:rgba(255,255,255,.45);
+    border-radius:9px;padding:7px 10px}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Host panel</h1>
+  <p class="note">Only you should open this page \u2014 bookmark it. The filename is deliberately unguessable so guests can't find the answer key. It assigns each person a word, writes the text messages, and holds the answer key.</p>
+
+  <h2>1 · Your guest list</h2>
+  <p class="note">One name per line. Paste straight from your phone's contacts or notes app.</p>
+  <textarea id="names" placeholder="Alex&#10;Bea&#10;Cam&#10;…"></textarea>
+  <div class="row">
+    <button id="assign">Assign words</button>
+    <button class="ghost" id="reshuffle">Reshuffle</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="out" class="hide">
+    <h2>2 · The board link</h2>
+    <p class="note">Include this link in every text. It renders only the words that are actually in play for your headcount.</p>
+    <div class="link">
+      <code id="url"></code>
+      <button class="ghost" id="copyurl">Copy</button>
+    </div>
+
+    <h2>3 · Who gets what</h2>
+    <p class="note">Tap <b>Copy text</b> next to a name, then paste it into their message. The colour chip is their team — guests never see it.</p>
+    <div class="row">
+      <button class="ghost" id="copyall">Copy whole roster</button>
+    </div>
+    <table>
+      <thead><tr><th>Name</th><th>Word</th><th>Team</th><th></th></tr></thead>
+      <tbody id="roster"></tbody>
+    </table>
+
+    <h2>4 · Answer key</h2>
+    <div id="key"></div>
+  </div>
+</div>
+
+<script src="puzzle.js"></script>
+<script>
+(function(){
+  var SKEY = "fyp:host";
+  var $names=document.getElementById("names"), $count=document.getElementById("count"),
+      $out=document.getElementById("out"), $roster=document.getElementById("roster"),
+      $key=document.getElementById("key"), $url=document.getElementById("url");
+
+  var saved = {};
+  try{ saved = JSON.parse(localStorage.getItem(SKEY) || "{}"); }catch(e){}
+  if(saved.raw) $names.value = saved.raw;
+  var seed = saved.seed || 12345;
+
+  function parseNames(){
+    return $names.value.split("\n").map(function(s){
+      return s.replace(/^\s*[-*\d.)]*\s*/,"").trim();
+    }).filter(Boolean);
+  }
+
+  function boardUrl(n){
+    /* strip the host page's own filename, keep the directory */
+    var base = location.href.split(/[?#]/)[0].replace(/[^\/]*$/, "");
+    return base + "?n=" + n;
+  }
+
+  function msgFor(name, word, n){
+    return "Hi " + name + "! For the game: your word is " + word.toUpperCase() +
+      ". Open " + boardUrl(n) + " on your phone, find the words that belong with yours, " +
+      "and the people holding them are your team. Don't tell anyone your word — go find them.";
+  }
+
+  function updateCount(){
+    var names = parseNames();
+    var n = names.length;
+    var bad = n < PUZZLE.MIN_PLAYERS || n > PUZZLE.MAX_PLAYERS;
+    $count.className = "count" + (bad && n ? " bad" : "");
+    if(!n){ $count.textContent = ""; return; }
+    $count.textContent = bad
+      ? n + " names — needs " + PUZZLE.MIN_PLAYERS + "–" + PUZZLE.MAX_PLAYERS
+      : n + " names";
+  }
+
+  function build(){
+    var names = parseNames();
+    var n = names.length;
+    if(n < PUZZLE.MIN_PLAYERS || n > PUZZLE.MAX_PLAYERS){
+      alert("You need between " + PUZZLE.MIN_PLAYERS + " and " + PUZZLE.MAX_PLAYERS +
+            " names. Add a 7th word to each category in puzzle.js to go higher.");
+      return;
+    }
+
+    var groups = PUZZLE.activeGroups(n);
+    var words  = PUZZLE.seededShuffle(PUZZLE.allActiveWords(n), seed);
+    var people = names.map(function(name, i){
+      var word = words[i];
+      return { name:name, word:word, group:PUZZLE.groupOf(word, n) };
+    });
+
+    try{ localStorage.setItem(SKEY, JSON.stringify({ raw:$names.value, seed:seed })); }catch(e){}
+
+    $url.textContent = boardUrl(n);
+    document.getElementById("copyurl").onclick = function(){ copy(boardUrl(n), this); };
+
+    /* roster */
+    $roster.innerHTML = "";
+    people.forEach(function(p){
+      var tr = document.createElement("tr");
+      tr.innerHTML = '<td>' + esc(p.name) + '</td>' +
+        '<td class="w">' + p.word + '</td>' +
+        '<td><span class="chip" style="background:' + p.group.color + '">' + p.group.name + '</span></td>' +
+        '<td class="act"><button class="ghost">Copy text</button></td>';
+      tr.querySelector("button").onclick = function(){ copy(msgFor(p.name, p.word, n), this); };
+      $roster.appendChild(tr);
+    });
+
+    document.getElementById("copyall").onclick = function(){
+      var txt = people.map(function(p){ return p.name + "\t" + p.word + "\t" + p.group.name; }).join("\n");
+      copy(txt, this);
+    };
+
+    /* answer key */
+    $key.innerHTML = "";
+    groups.forEach(function(g){
+      var mem = people.filter(function(p){ return p.group.id === g.id; });
+      var el = document.createElement("div");
+      el.className = "keycard";
+      el.style.background = g.color;
+      el.innerHTML = '<div class="n">' + g.name + ' · ' + mem.length + ' people</div>' +
+        '<div class="ws">' + g.words.join(" · ") + '</div>' +
+        '<div class="ppl">' + mem.map(function(p){
+          return esc(p.name) + " <b>(" + p.word + ")</b>";
+        }).join(" · ") + '</div>';
+      $key.appendChild(el);
+    });
+
+    $out.classList.remove("hide");
+  }
+
+  function esc(s){ return s.replace(/[&<>"]/g, function(c){
+    return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c];
+  }); }
+
+  function copy(text, btn){
+    var done = function(){
+      var old = btn.textContent; btn.textContent = "Copied";
+      setTimeout(function(){ btn.textContent = old; }, 1100);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(text); done(); });
+    } else { fallback(text); done(); }
+  }
+  function fallback(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  $names.addEventListener("input", updateCount);
+  document.getElementById("assign").onclick = build;
+  document.getElementById("reshuffle").onclick = function(){
+    seed = (seed * 48271 + 11) % 2147483647;
+    build();
+  };
+
+  updateCount();
+  if(saved.raw && parseNames().length >= PUZZLE.MIN_PLAYERS) build();
+})();
+</script>
+</body>
+</html>
