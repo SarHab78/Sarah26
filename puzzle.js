@@ -17,14 +17,14 @@ window.PUZZLE = {
       id: "costco",
       name: "ONLY AT COSTCO",
       color: "#F0B429",
-      words: ["ROTISSERIE", "CHURRO", "PALLET", "SAMPLES", "GOLD", "CASKET", "KIRKLAND"],
+      words: ["GOLD", "ROTISSERIE", "CHURRO", "PALLET", "SAMPLES", "CASKET", "KIRKLAND"],
     },
     {
       /* All six are things Costco sells - the pull runs both directions */
       id: "beach",
       name: "IN THE BEACH BAG",
       color: "#3FA7A0",
-      words: ["TOWEL", "SUNSCREEN", "UMBRELLA", "COOLER", "FRISBEE", "SANDALS", "CHAIR"],
+      words: ["TOWEL", "SUNSCREEN", "COOLER", "SANDALS", "UMBRELLA", "FRISBEE", "CHAIR"],
     },
     {
       /* Every one is food-sounding. BREAD is the cruel one: real band AND
@@ -32,28 +32,28 @@ window.PUZZLE = {
       id: "bands",
       name: "ACTUALLY BANDS",
       color: "#A86FD1",
-      words: ["GARBAGE", "CAKE", "CREAM", "BREAD", "PULP", "KORN", "TOTO"],
+      words: ["BREAD", "GARBAGE", "CAKE", "CREAM", "PULP", "KORN", "TOTO"],
     },
     {
       /* Reads as a Costco grocery run; CLAMS reads as beach */
       id: "money",
       name: "SLANG FOR MONEY",
       color: "#7FB069",
-      words: ["BACON", "CHEDDAR", "LETTUCE", "CABBAGE", "DOUGH", "CLAMS", "SCRATCH"],
+      words: ["CLAMS", "CHEDDAR", "DOUGH", "BACON", "CABBAGE", "LETTUCE", "SCRATCH"],
     },
     {
       /* BLUE and POKER pull toward money, TORTILLA and CHOCOLATE toward Costco */
       id: "chips",
       name: "KINDS OF CHIPS",
       color: "#5B8FD9",
-      words: ["BLUE", "POKER", "WOOD", "MICRO", "TORTILLA", "CHOCOLATE", "PAINT"],
+      words: ["BLUE", "POKER", "TORTILLA", "CHOCOLATE", "WOOD", "MICRO", "PAINT"],
     },
     {
       /* Steals the two most obvious beach words; BILL and CARD pull money */
       id: "board",
       name: "___ BOARD",
       color: "#E8795A",
-      words: ["SURF", "BOOGIE", "SKATE", "CHALK", "CARD", "BILL", "DASH"],
+      words: ["SURF", "BOOGIE", "BILL", "CARD", "SKATE", "CHALK", "DASH"],
     },
   ],
 };

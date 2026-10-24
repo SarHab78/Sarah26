@@ -47,13 +47,20 @@
   <h1>Host panel</h1>
   <p class="note">Only you should open this page \u2014 bookmark it. The filename is deliberately unguessable so guests can't find the answer key. It assigns each person a word, writes the text messages, and holds the answer key.</p>
 
-  <h2>1 · Your guest list</h2>
-  <p class="note">One name per line. Paste straight from your phone's contacts or notes app.</p>
-  <textarea id="names" placeholder="Alex&#10;Bea&#10;Cam&#10;…"></textarea>
-  <div class="row">
-    <button id="assign">Assign words</button>
-    <button class="ghost" id="reshuffle">Reshuffle</button>
-    <span class="count" id="count"></span>
+  <div id="fixed" class="hide">
+    <h2>1 · Teams</h2>
+    <p class="note" id="fixednote"></p>
+  </div>
+
+  <div id="freeform">
+    <h2>1 · Your guest list</h2>
+    <p class="note">One name per line. Paste straight from your phone's contacts or notes app.</p>
+    <textarea id="names" placeholder="Alex&#10;Bea&#10;Cam&#10;…"></textarea>
+    <div class="row">
+      <button id="assign">Assign words</button>
+      <button class="ghost" id="reshuffle">Reshuffle</button>
+      <span class="count" id="count"></span>
+    </div>
   </div>
 
   <div id="out" class="hide">
@@ -80,12 +87,18 @@
 </div>
 
 <script src="puzzle.js"></script>
+<script src="roster.js"></script>
 <script>
 (function(){
   var SKEY = "fyp:host";
-  var $names=document.getElementById("names"), $count=document.getElementById("count"),
+  var $names=document.getElementById("names") || {value:"", addEventListener:function(){}},
+      $count=document.getElementById("count") || {},
       $out=document.getElementById("out"), $roster=document.getElementById("roster"),
       $key=document.getElementById("key"), $url=document.getElementById("url");
+
+  var FIXED = (window.ROSTER && window.ROSTER.teams && window.ROSTER.teams.length) ? window.ROSTER : null;
+
+  var UNCLAIMED = [];
 
   var saved = {};
   try{ saved = JSON.parse(localStorage.getItem(SKEY) || "{}"); }catch(e){}
@@ -121,23 +134,70 @@
       : n + " names";
   }
 
+  /* Teams are already decided, so pin each one to a category and hand out
+     that category's words in order - never shuffle across teams. */
+  function peopleFromRoster(){
+    var n = FIXED.headcount;
+    var byId = {};
+    PUZZLE.activeGroups(n).forEach(function(g){ byId[g.id] = g; });
+    var out = [], problems = [], unclaimed = [];
+    FIXED.teams.forEach(function(t){
+      var g = byId[t.categoryId];
+      if(!g){ problems.push(t.label + ': unknown category "' + t.categoryId + '"'); return; }
+      if(t.people.length > g.words.length){
+        problems.push(t.label + ' has ' + t.people.length + ' people but ' +
+                      g.name + ' only has ' + g.words.length + ' words');
+      }
+      g.words.slice(t.people.length).forEach(function(w){ unclaimed.push({ word:w, group:g }); });
+      t.people.forEach(function(name, i){
+        if(i < g.words.length) out.push({ name:name, word:g.words[i], group:g, team:t.label });
+      });
+    });
+    return { people: out, problems: problems, unclaimed: unclaimed };
+  }
+
   function build(){
-    var names = parseNames();
-    var n = names.length;
-    if(n < PUZZLE.MIN_PLAYERS || n > PUZZLE.MAX_PLAYERS){
-      alert("You need between " + PUZZLE.MIN_PLAYERS + " and " + PUZZLE.MAX_PLAYERS +
-            " names. Add a 7th word to each category in puzzle.js to go higher.");
-      return;
+    var n, people, groups;
+
+    if(FIXED){
+      var r = peopleFromRoster();
+      if(r.problems.length){ alert("Roster problem:\n\n" + r.problems.join("\n")); return; }
+      n = FIXED.headcount;
+      people = r.people;
+      groups = PUZZLE.activeGroups(n);
+      var dupe = {}, dl = [];
+      people.forEach(function(p){
+        var k = p.name.toLowerCase().trim();
+        if(dupe[k]) dl.push(p.name); else dupe[k] = 1;
+      });
+      UNCLAIMED = r.unclaimed;
+      document.getElementById("fixednote").innerHTML =
+        people.length + " people across " + FIXED.teams.length + " teams, no random assignment \u2014 " +
+        "everyone gets the word for the team they're already on." +
+        (UNCLAIMED.length
+          ? " The board still shows all " + n + " words, so <b>" + UNCLAIMED.length +
+            " belong to nobody: " + UNCLAIMED.map(function(u){ return u.word; }).join(", ") +
+            "</b>. That's expected \u2014 those teams just have a spare word."
+          : "") +
+        (dl.length ? " <b>Duplicate names: " + dl.join(", ") + "</b>" : "");
+      document.getElementById("fixed").classList.remove("hide");
+      document.getElementById("freeform").classList.add("hide");
+    } else {
+      var names = parseNames();
+      n = names.length;
+      if(n < PUZZLE.MIN_PLAYERS || n > PUZZLE.MAX_PLAYERS){
+        alert("You need between " + PUZZLE.MIN_PLAYERS + " and " + PUZZLE.MAX_PLAYERS +
+              " names. Add a 7th word to each category in puzzle.js to go higher.");
+        return;
+      }
+      groups = PUZZLE.activeGroups(n);
+      var words = PUZZLE.seededShuffle(PUZZLE.allActiveWords(n), seed);
+      people = names.map(function(name, i){
+        return { name:name, word:words[i], group:PUZZLE.groupOf(words[i], n) };
+      });
     }
 
-    var groups = PUZZLE.activeGroups(n);
-    var words  = PUZZLE.seededShuffle(PUZZLE.allActiveWords(n), seed);
-    var people = names.map(function(name, i){
-      var word = words[i];
-      return { name:name, word:word, group:PUZZLE.groupOf(word, n) };
-    });
-
-    try{ localStorage.setItem(SKEY, JSON.stringify({ raw:$names.value, seed:seed })); }catch(e){}
+    if(!FIXED){ try{ localStorage.setItem(SKEY, JSON.stringify({ raw:$names.value, seed:seed })); }catch(e){} }
 
     $url.textContent = boardUrl(n);
     document.getElementById("copyurl").onclick = function(){ copy(boardUrl(n), this); };
@@ -146,7 +206,7 @@
     $roster.innerHTML = "";
     people.forEach(function(p){
       var tr = document.createElement("tr");
-      tr.innerHTML = '<td>' + esc(p.name) + '</td>' +
+      tr.innerHTML = '<td>' + esc(p.name) + (p.team ? ' <span style="color:var(--muted);font-size:12px">' + esc(p.team) + '</span>' : '') + '</td>' +
         '<td class="w">' + p.word + '</td>' +
         '<td><span class="chip" style="background:' + p.group.color + '">' + p.group.name + '</span></td>' +
         '<td class="act"><button class="ghost">Copy text</button></td>';
@@ -155,7 +215,7 @@
     });
 
     document.getElementById("copyall").onclick = function(){
-      var txt = people.map(function(p){ return p.name + "\t" + p.word + "\t" + p.group.name; }).join("\n");
+      var txt = people.map(function(p){ return p.name + "\t" + p.word + "\t" + (p.team ? p.team + "\t" : "") + p.group.name; }).join("\n");
       copy(txt, this);
     };
 
@@ -166,8 +226,14 @@
       var el = document.createElement("div");
       el.className = "keycard";
       el.style.background = g.color;
+      var spare = {};
+      UNCLAIMED.forEach(function(u){ if(u.group.id === g.id) spare[u.word] = 1; });
       el.innerHTML = '<div class="n">' + g.name + ' · ' + mem.length + ' people</div>' +
-        '<div class="ws">' + g.words.join(" · ") + '</div>' +
+        '<div class="ws">' + g.words.map(function(w){
+            return spare[w] ? '<s style="opacity:.55">' + w + '</s>' : w;
+          }).join(" · ") +
+          (Object.keys(spare).length ? ' <span style="font-weight:800">(struck = nobody has it)</span>' : '') +
+        '</div>' +
         '<div class="ppl">' + mem.map(function(p){
           return esc(p.name) + " <b>(" + p.word + ")</b>";
         }).join(" · ") + '</div>';
@@ -198,15 +264,18 @@
     document.body.removeChild(ta);
   }
 
-  $names.addEventListener("input", updateCount);
-  document.getElementById("assign").onclick = build;
-  document.getElementById("reshuffle").onclick = function(){
-    seed = (seed * 48271 + 11) % 2147483647;
+  if(FIXED){
     build();
-  };
-
-  updateCount();
-  if(saved.raw && parseNames().length >= PUZZLE.MIN_PLAYERS) build();
+  } else {
+    $names.addEventListener("input", updateCount);
+    document.getElementById("assign").onclick = build;
+    document.getElementById("reshuffle").onclick = function(){
+      seed = (seed * 48271 + 11) % 2147483647;
+      build();
+    };
+    updateCount();
+    if(saved.raw && parseNames().length >= PUZZLE.MIN_PLAYERS) build();
+  }
 })();
 </script>
 </body>
