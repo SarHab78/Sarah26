@@ -88,6 +88,34 @@
     box-shadow:0 4px 0 rgba(42,30,46,.12)
   }
 
+  /* ---------- name gate ---------- */
+  .gate{
+    background:var(--card);border:2px solid var(--line);border-radius:20px;
+    padding:18px 16px;margin:0 0 14px;text-align:center;
+    box-shadow:0 3px 0 rgba(42,30,46,.06)
+  }
+  .gate label{display:block;font-size:19px;font-weight:600;margin-bottom:12px}
+  .gate form{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+  .gate input{
+    flex:1 1 150px;min-width:0;font:inherit;font-size:18px;font-weight:600;text-align:center;
+    padding:13px 14px;border:2px solid var(--line);border-radius:14px;
+    background:var(--bg);color:var(--ink)
+  }
+  .gate input:focus{outline:none;border-color:var(--pink)}
+  .gate button{
+    appearance:none;border:0;font:inherit;font-weight:700;font-size:17px;color:#fff;
+    padding:13px 22px;border-radius:999px;cursor:pointer;
+    background:linear-gradient(95deg,var(--pink),var(--purple));
+    box-shadow:0 3px 0 rgba(42,30,46,.18)
+  }
+  .gate button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(42,30,46,.18)}
+  .gate p{margin:12px 0 0;font-size:15px;line-height:1.45;color:var(--muted);font-weight:500}
+  .gate p.bad{color:#C0392B;font-weight:600}
+  .gate p b{color:var(--ink)}
+  .gate .alt{background:none;border:0;color:var(--muted);font:inherit;font-size:15px;
+             font-weight:600;text-decoration:underline;cursor:pointer;padding:0;box-shadow:none}
+  .hide{display:none}
+
   /* ---------- solved teams ---------- */
   .team{
     border-radius:20px;padding:16px 17px;margin-bottom:11px;
@@ -163,6 +191,16 @@
     <p class="sub">Find your category!</p>
   </header>
 
+  <div id="gate" class="gate hide">
+    <label for="who">What's your first name?</label>
+    <form id="gateform" autocomplete="off">
+      <input id="who" type="text" inputmode="text" autocapitalize="words"
+             autocorrect="off" spellcheck="false" placeholder="e.g. Riley">
+      <button type="submit" id="go">Get my word</button>
+    </form>
+    <p id="gatemsg"></p>
+  </div>
+
   <div id="mine" class="mine prompt"></div>
   <div id="teams"></div>
   <div id="grid"></div>
@@ -178,6 +216,7 @@
 </div>
 
 <script src="puzzle.js"></script>
+<script src="roster.js"></script>
 <script>
 (function(){
   /* fill the paper chain to whatever width the phone is */
@@ -202,10 +241,52 @@
   function load(){
     try{
       var s = JSON.parse(localStorage.getItem(KEY) || "{}");
-      return { mine: s.mine || null, solved: s.solved || [], guesses: s.guesses || 0 };
-    }catch(e){ return { mine:null, solved:[], guesses:0 }; }
+      return { mine: s.mine || null, name: s.name || null, solved: s.solved || [], guesses: s.guesses || 0 };
+    }catch(e){ return { mine:null, name:null, solved:[], guesses:0 }; }
   }
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  /* name -> word, built from the fixed roster. First names only, lowercased,
+     and matched EXACTLY - prefix matching would hand "Joe" to Joel. */
+  var BY_NAME = (function(){
+    if(!window.ROSTER || !ROSTER.teams) return null;
+    var byId = {}, map = {}, dupes = {};
+    PUZZLE.activeGroups(N).forEach(function(g){ byId[g.id] = g; });
+    ROSTER.teams.forEach(function(t){
+      var g = byId[t.categoryId];
+      if(!g) return;
+      t.people.forEach(function(person, i){
+        if(i >= g.words.length) return;
+        var first = String(person).trim().split(/\s+/)[0].toLowerCase();
+        if(map[first]) dupes[first] = true;
+        map[first] = { word:g.words[i], display:String(person).trim().split(/\s+/)[0] };
+      });
+    });
+    Object.keys(dupes).forEach(function(k){ map[k].ambiguous = true; });
+    return map;
+  })();
+
+  function editDistance(a,b){
+    var m=a.length,n=b.length,prev=[],cur=[],i,j;
+    for(j=0;j<=n;j++) prev[j]=j;
+    for(i=1;i<=m;i++){
+      cur[0]=i;
+      for(j=1;j<=n;j++){
+        cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a.charAt(i-1)===b.charAt(j-1)?0:1));
+      }
+      for(j=0;j<=n;j++) prev[j]=cur[j];
+    }
+    return prev[n];
+  }
+  function nearestNames(q){
+    if(!BY_NAME) return [];
+    return Object.keys(BY_NAME)
+      .map(function(k){ return { k:k, d:editDistance(q,k) }; })
+      .filter(function(x){ return x.d <= 2; })
+      .sort(function(a,b){ return a.d - b.d; })
+      .slice(0,3)
+      .map(function(x){ return BY_NAME[x.k].display; });
+  }
 
   var picking = !state.mine;
   var sel = [];
@@ -261,10 +342,15 @@
       $mine.innerHTML = "🎉 Tap your word below to start";
     } else {
       $mine.className = "mine";
-      $mine.innerHTML = '<div class="lab">Your word</div><b>' + state.mine + '</b>' +
-        '<button id="rp">not mine — change</button>';
+      $mine.innerHTML = '<div class="lab">' + (state.name ? state.name + " — your word" : "Your word") +
+        '</div><b>' + state.mine + '</b>' +
+        '<button id="rp">not you? change</button>';
       document.getElementById("rp").onclick = function(){
-        picking = true; sel = []; render();
+        picking = true; sel = [];
+        state.name = null;
+        if($who) $who.value = "";
+        if($gatemsg){ $gatemsg.className = ""; $gatemsg.textContent = ""; }
+        render();
       };
     }
 
@@ -307,7 +393,9 @@
     $clear.hidden = sel.length === 0;
     $check.disabled = !checkable();
     if(picking){
-      $msg.textContent = "Which one is yours?";
+      $msg.textContent = BY_NAME
+        ? "Enter your name above to get your word."
+        : "Which one is yours?";
       $msg.className = "msg hot";
       $check.disabled = true;
     } else if(mg && state.solved.indexOf(mg.id) > -1){
@@ -319,6 +407,7 @@
         : "Pick the " + target + " words that go together.";
       $msg.className = "msg";
     }
+    renderGate();
     $foot.textContent = state.guesses
       ? state.solved.length + " of " + GROUPS.length + " teams found · " + state.guesses + " guess" + (state.guesses===1?"":"es")
       : state.solved.length + " of " + GROUPS.length + " teams found";
@@ -348,6 +437,16 @@
 
   function tap(w){
     if(picking){
+      /* While the name gate is up, tiles must not assign. Otherwise someone
+         idly poking the board silently ends up with the wrong word. */
+      if(BY_NAME){
+        if($who) $who.focus();
+        if($gatemsg && !$gatemsg.textContent){
+          $gatemsg.className = "";
+          $gatemsg.textContent = "Enter your name first and I'll give you your word.";
+        }
+        return;
+      }
       state.mine = w; picking = false; sel = []; save(); render(); return;
     }
     var i = sel.indexOf(w);
@@ -358,6 +457,61 @@
     }
     render();
   }
+
+  /* ---------- name gate ---------- */
+  var $gate=document.getElementById("gate"), $who=document.getElementById("who"),
+      $gatemsg=document.getElementById("gatemsg"), $gateform=document.getElementById("gateform");
+
+  function gateVisible(){ return BY_NAME && picking; }
+
+  function renderGate(){
+    if(gateVisible()){
+      $gate.classList.remove("hide");
+      $mine.classList.add("hide");
+    } else {
+      $gate.classList.add("hide");
+      $mine.classList.remove("hide");
+    }
+  }
+
+  $gateform.onsubmit = function(e){
+    e.preventDefault();
+    var raw = ($who.value || "").trim();
+    if(!raw){ return; }
+    var q = raw.split(/\s+/)[0].toLowerCase();
+    var hit = BY_NAME[q];
+
+    if(hit && hit.ambiguous){
+      $gatemsg.className = "bad";
+      $gatemsg.textContent = "There's more than one " + hit.display + " here — ask Sarah which word is yours.";
+      return;
+    }
+    if(hit){
+      state.mine = hit.word;
+      state.name = hit.display;
+      picking = false;
+      sel = [];
+      save();
+      $gatemsg.textContent = "";
+      render();
+      return;
+    }
+
+    var near = nearestNames(q);
+    $gatemsg.className = "bad";
+    $gatemsg.innerHTML = "No <b>" + raw.replace(/[<>&]/g,"") + "</b> on the list. " +
+      (near.length ? "Did you mean <b>" + near.join("</b> or <b>") + "</b>? " : "") +
+      '<button type="button" class="alt" id="selfpick">Pick my word myself</button>';
+    var sp = document.getElementById("selfpick");
+    if(sp) sp.onclick = function(){
+      $gatemsg.className = "";
+      $gatemsg.textContent = "Tap your word in the grid below.";
+      $gate.classList.add("hide");
+      $mine.classList.remove("hide");
+      BY_NAME = null;           /* fall back to the original tap-to-pick flow */
+      render();
+    };
+  };
 
   $clear.onclick = function(){ sel = []; render(); };
 

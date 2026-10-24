@@ -7,13 +7,15 @@ Find the words that belong with yours — the people holding them are your team.
 
 ## Running the game
 
-1. Open **`/host-5bj8pr.html`** (just you). Paste your guest list, one name per line.
-2. Hit **Assign words**. You get:
-   - the board link to share,
-   - a ready-to-send text for each person (tap *Copy text*),
-   - the answer key with every team's roster.
-3. Text each person their message.
-4. Guests open the board link, tap their own word, then hunt for their group.
+Share **one link** with everyone. Each guest types their first name
+(case-insensitive, first name only) and the board hands them their word.
+
+`/host-5bj8pr.html` is the host page: it holds the answer key, the full
+name-to-word list, and a ready-to-send text per person as a backup for
+anyone who can't find themselves.
+
+Teams live in `roster.js`. Each team is pinned to a category and its
+members get that category's words in order - nothing is random.
 
 ## Changing the words
 
