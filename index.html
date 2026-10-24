@@ -3,55 +3,78 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FFF6EC">
-<title>Find Your People</title>
+<meta name="theme-color" content="#EDF7E8">
+<title>Find Your Team</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FFF6EC; --card:#FFFFFF; --ink:#2B1B2E; --muted:#7A6B78;
-    --line:#F0DFCE; --tile:#FFFFFF;
-    --pink:#FF4D8D; --orange:#FF8A3D; --yellow:#FFC928;
-    --mint:#2ED9A8; --sky:#35A7FF; --purple:#A05CFF;
+    --bg:#EDF7E8; --card:#FFFFFF; --ink:#2A1E2E; --muted:#796B78;
+    --line:#D9E9D2; --tile:#FFFFFF; --gold:#E0A92E;
+    --pink:#FF3D8B; --orange:#FF8A3D; --yellow:#FFC928;
+    --green:#3FD16B; --sky:#27B6F0; --purple:#9B5DE5;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
     background:var(--bg); color:var(--ink);
-    font-family:"Fredoka",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-family:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     font-weight:500;
     -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent;
-    padding:0 14px calc(118px + env(safe-area-inset-bottom));
+    padding:0 0 calc(118px + env(safe-area-inset-bottom));
   }
-  /* confetti, fixed behind everything and never under running text */
+  /* paper-chain garland across the top, like the real room */
+  .garland{display:flex;gap:3px;padding:7px 0 11px;overflow:hidden}
+  .garland i{flex:1 0 auto;height:17px;width:21px;border-radius:5px;display:block}
+  .garland i:nth-child(6n+1){background:var(--pink);transform:rotate(-4deg)}
+  .garland i:nth-child(6n+2){background:var(--orange);transform:rotate(3deg)}
+  .garland i:nth-child(6n+3){background:var(--yellow);transform:rotate(-2deg)}
+  .garland i:nth-child(6n+4){background:var(--green);transform:rotate(4deg)}
+  .garland i:nth-child(6n+5){background:var(--sky);transform:rotate(-3deg)}
+  .garland i:nth-child(6n+6){background:var(--purple);transform:rotate(2deg)}
+
+  /* confetti dots, fixed behind everything and never under running text */
   body::before{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.42;
     background-image:
-      radial-gradient(circle at 6% 8%,   #FF4D8D 0 6px, transparent 7px),
-      radial-gradient(circle at 93% 14%, #35A7FF 0 7px, transparent 8px),
-      radial-gradient(circle at 18% 31%, #FFC928 0 5px, transparent 6px),
-      radial-gradient(circle at 81% 42%, #2ED9A8 0 6px, transparent 7px),
-      radial-gradient(circle at 9% 57%,  #A05CFF 0 5px, transparent 6px),
-      radial-gradient(circle at 95% 69%, #FF8A3D 0 6px, transparent 7px),
-      radial-gradient(circle at 23% 83%, #35A7FF 0 5px, transparent 6px),
-      radial-gradient(circle at 88% 92%, #FF4D8D 0 6px, transparent 7px);
+      radial-gradient(circle at 5% 11%,  #FF3D8B 0 6px, transparent 7px),
+      radial-gradient(circle at 94% 16%, #27B6F0 0 7px, transparent 8px),
+      radial-gradient(circle at 16% 29%, #FFC928 0 5px, transparent 6px),
+      radial-gradient(circle at 84% 38%, #3FD16B 0 6px, transparent 7px),
+      radial-gradient(circle at 7% 49%,  #9B5DE5 0 5px, transparent 6px),
+      radial-gradient(circle at 96% 58%, #FF8A3D 0 6px, transparent 7px),
+      radial-gradient(circle at 13% 68%, #27B6F0 0 5px, transparent 6px),
+      radial-gradient(circle at 90% 77%, #FF3D8B 0 6px, transparent 7px),
+      radial-gradient(circle at 20% 88%, #3FD16B 0 5px, transparent 6px),
+      radial-gradient(circle at 80% 95%, #9B5DE5 0 6px, transparent 7px);
   }
-  .wrap{max-width:580px;margin:0 auto;position:relative}
+  /* a little gold, for the chairs and the star garlands */
+  .sparkle{position:fixed;inset:0;z-index:-1;pointer-events:none}
+  .sparkle span{position:absolute;color:var(--gold);font-size:17px;opacity:.5;line-height:1}
+  .sparkle span:nth-child(1){top:7%;left:24%;font-size:13px}
+  .sparkle span:nth-child(2){top:22%;right:9%}
+  .sparkle span:nth-child(3){top:44%;left:6%;font-size:12px}
+  .sparkle span:nth-child(4){top:61%;right:19%;font-size:20px}
+  .sparkle span:nth-child(5){top:79%;left:11%}
+  .sparkle span:nth-child(6){top:93%;right:7%;font-size:13px}
+
+  .wrap{max-width:580px;margin:0 auto;position:relative;padding:0 14px}
 
   header{padding:26px 2px 16px;text-align:center}
   h1{
     margin:0;font-size:34px;font-weight:700;letter-spacing:-.5px;line-height:1.05;
-    background:linear-gradient(100deg,var(--pink),var(--orange) 45%,var(--purple));
+    background:linear-gradient(95deg,var(--pink),#F2711C 22%,#D99A1F 40%,
+                #27A857 58%,#1E92D4 76%,var(--purple));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .sub{margin:10px auto 0;max-width:30ch;font-size:16px;line-height:1.4;color:var(--muted)}
+  .sub{margin:8px auto 0;font-size:19px;font-weight:600;line-height:1.3;color:var(--muted)}
 
   /* ---------- your word ---------- */
   .mine{
     background:var(--card);border:2px solid var(--line);border-radius:20px;
     padding:14px 16px;margin:0 0 16px;text-align:center;
-    box-shadow:0 3px 0 rgba(43,27,46,.06)
+    box-shadow:0 3px 0 rgba(42,30,46,.06)
   }
   .mine .lab{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .mine b{display:block;font-size:30px;font-weight:700;line-height:1.15;margin-top:3px;letter-spacing:-.3px}
@@ -60,58 +83,59 @@
     font:inherit;font-weight:600;font-size:14px;padding:7px 16px;border-radius:999px;cursor:pointer
   }
   .mine.prompt{
-    background:linear-gradient(100deg,var(--pink),var(--purple));border-color:transparent;
+    background:linear-gradient(95deg,var(--pink),var(--orange) 50%,var(--purple));border-color:transparent;
     color:#fff;font-size:19px;font-weight:600;padding:18px 16px;
-    box-shadow:0 4px 0 rgba(43,27,46,.12)
+    box-shadow:0 4px 0 rgba(42,30,46,.12)
   }
 
   /* ---------- solved teams ---------- */
   .team{
     border-radius:20px;padding:16px 17px;margin-bottom:11px;
-    animation:pop .36s cubic-bezier(.2,1.35,.5,1);box-shadow:0 4px 0 rgba(43,27,46,.1)
+    animation:pop .36s cubic-bezier(.2,1.35,.5,1);box-shadow:0 4px 0 rgba(42,30,46,.1)
   }
   @keyframes pop{from{transform:scale(.92) rotate(-1deg);opacity:0}to{transform:none;opacity:1}}
   .team .label{font-size:12px;font-weight:700;letter-spacing:.14em;opacity:.7}
   .team .name{font-size:23px;font-weight:700;margin:1px 0 7px;letter-spacing:-.3px;line-height:1.1}
   .team .ws{font-size:15px;line-height:1.55;font-weight:600;opacity:.9}
-  .team.yours{box-shadow:0 0 0 4px var(--ink),0 4px 0 rgba(43,27,46,.1)}
+  .team.yours{box-shadow:0 0 0 4px var(--ink),0 4px 0 rgba(42,30,46,.1)}
 
   /* ---------- grid ---------- */
   /* 3 across on a phone: fewer, bigger, easier-to-read tiles */
   #grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
   @media (min-width:470px){#grid{grid-template-columns:repeat(4,1fr)}}
-  @media (min-width:700px){#grid{grid-template-columns:repeat(6,1fr)}}
+  @media (min-width:860px){#grid{grid-template-columns:repeat(6,1fr)}}
   .tile{
     position:relative;appearance:none;border:2px solid var(--line);font:inherit;cursor:pointer;
     background:var(--tile);color:var(--ink);border-radius:16px;
     min-height:76px;padding:8px 5px;display:flex;align-items:center;justify-content:center;
     text-align:center;font-weight:700;line-height:1.1;letter-spacing:-.2px;
-    font-size:clamp(14px,4.3vw,19px);word-break:break-word;hyphens:auto;
-    box-shadow:0 3px 0 rgba(43,27,46,.07);
+    font-size:clamp(14px,4.3vw,19px);
+    white-space:nowrap;word-break:normal;hyphens:none;overflow:hidden;
+    box-shadow:0 3px 0 rgba(42,30,46,.07);
     transition:transform .09s,box-shadow .09s,background .14s,color .14s
   }
-  .tile:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(43,27,46,.07)}
+  .tile:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(42,30,46,.07)}
   .tile.on{
-    background:linear-gradient(135deg,var(--pink),var(--purple));
+    background:linear-gradient(140deg,var(--pink),var(--purple));
     color:#fff;border-color:transparent;
-    box-shadow:0 3px 0 rgba(43,27,46,.18)
+    box-shadow:0 3px 0 rgba(42,30,46,.18)
   }
-  .tile.me{border-color:var(--ink);border-width:3px}
+  .tile.me{border-color:var(--gold);border-width:3px}
   .tile.me::after{
     content:"YOURS";position:absolute;top:-9px;left:50%;transform:translateX(-50%);
-    background:var(--ink);color:#fff;font-size:9px;font-weight:700;letter-spacing:.1em;
+    background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:.1em;
     padding:2px 8px;border-radius:999px;white-space:nowrap
   }
   .tile.me.on{border-color:#fff}
-  .tile.me.on::after{background:#fff;color:var(--ink)}
+  .tile.me.on::after{background:#fff;color:var(--gold)}
   /* a hint that every tile is tappable, without 36 loud outlines */
-  #grid.picking .tile{border-color:#FFC9DC}
+  #grid.picking .tile{border-color:#FFC4DD}
   .shake{animation:shake .4s}
   @keyframes shake{10%,90%{transform:translateX(-3px)}30%,70%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
 
   /* ---------- bottom bar ---------- */
   .bar{
-    position:fixed;left:0;right:0;bottom:0;background:rgba(255,246,236,.96);
+    position:fixed;left:0;right:0;bottom:0;background:rgba(237,247,232,.96);
     backdrop-filter:blur(12px);border-top:2px solid var(--line);
     padding:13px 14px calc(13px + env(safe-area-inset-bottom));z-index:9
   }
@@ -121,20 +145,22 @@
   .btn{
     appearance:none;border:0;font:inherit;font-weight:700;font-size:17px;
     padding:14px 24px;border-radius:999px;cursor:pointer;white-space:nowrap;
-    box-shadow:0 3px 0 rgba(43,27,46,.18)
+    box-shadow:0 3px 0 rgba(42,30,46,.18)
   }
-  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(43,27,46,.18)}
-  .btn.go{background:linear-gradient(100deg,var(--pink),var(--purple));color:#fff}
-  .btn.go[disabled]{background:#EADCCB;color:#A99A8B;box-shadow:none;transform:none;cursor:default}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(42,30,46,.18)}
+  .btn.go{background:linear-gradient(95deg,var(--pink),var(--purple));color:#fff}
+  .btn.go[disabled]{background:#D3E4CC;color:#889D82;box-shadow:none;transform:none;cursor:default}
   .btn.ghost{background:var(--card);color:var(--muted);border:2px solid var(--line);padding:12px 16px;font-size:15px}
   footer{text-align:center;color:var(--muted);font-size:14px;font-weight:500;padding:22px 0 6px}
 </style>
 </head>
 <body>
+<div class="garland" id="garland" aria-hidden="true"></div>
+<div class="sparkle" aria-hidden="true"><span>&#10022;</span><span>&#10022;</span><span>&#10022;</span><span>&#10022;</span><span>&#10022;</span><span>&#10022;</span></div>
 <div class="wrap">
   <header>
-    <h1 id="title">Find Your People</h1>
-    <p class="sub">You got one word by text. Find the others whose words belong with yours — they're your team.</p>
+    <h1 id="title">Find Your Team</h1>
+    <p class="sub">Find your category!</p>
   </header>
 
   <div id="mine" class="mine prompt"></div>
@@ -154,6 +180,15 @@
 <script src="puzzle.js"></script>
 <script>
 (function(){
+  /* fill the paper chain to whatever width the phone is */
+  (function(){
+    var g = document.getElementById("garland");
+    var links = Math.ceil(window.innerWidth / 24) + 6;
+    var html = "";
+    for (var i = 0; i < links; i++) html += "<i></i>";
+    g.innerHTML = html;
+  })();
+
   var qs = new URLSearchParams(location.search);
   var N  = parseInt(qs.get("n"), 10) || 36;
   var GROUPS = PUZZLE.activeGroups(N);
@@ -188,7 +223,7 @@
   function inkOn(hex){
     var c = hex.replace("#","");
     var r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
-    return ((r*299 + g*587 + b*114) / 1000) >= 150 ? "#2B1B2E" : "#FFFFFF";
+    return ((r*299 + g*587 + b*114) / 1000) >= 150 ? "#2A1E2E" : "#FFFFFF";
   }
 
   function solvedWords(){
@@ -258,11 +293,14 @@
       remaining++;
       var b = document.createElement("button");
       b.className = "tile" + (sel.indexOf(w)>-1 ? " on":"") + (state.mine===w ? " me":"");
-      b.textContent = w;
+      var inner = document.createElement("span");
+      inner.textContent = w;
+      b.appendChild(inner);
       b.onclick = function(){ tap(w); };
       $grid.appendChild(b);
     });
     $grid.style.display = remaining ? "" : "none";
+    fitTiles();
 
     /* bar */
     var target = mg ? TEAM_SIZE_BY_ID[mg.id] : maxOpen();
@@ -285,6 +323,28 @@
       ? state.solved.length + " of " + GROUPS.length + " teams found · " + state.guesses + " guess" + (state.guesses===1?"":"es")
       : state.solved.length + " of " + GROUPS.length + " teams found";
   }
+
+  /* CHOCOLATE and ROTISSERIE are wider than a tile at the base size, and a
+     mid-word wrap ("CHOCOLAT / E") looks broken. Keep every word on one line
+     and step the type down only as far as that particular word needs. */
+  function fitTiles(){
+    var tiles = $grid.querySelectorAll(".tile");
+    for (var i = 0; i < tiles.length; i++){
+      var t = tiles[i], span = t.firstChild;
+      if(!span) continue;
+      span.style.fontSize = "";
+      var room = t.clientWidth - 12;
+      var size = parseFloat(window.getComputedStyle(t).fontSize);
+      var guard = 0;
+      while (span.offsetWidth > room && size > 10.5 && guard++ < 40){
+        size -= 0.5;
+        span.style.fontSize = size + "px";
+      }
+    }
+  }
+  window.addEventListener("resize", fitTiles);
+  window.addEventListener("orientationchange", function(){ setTimeout(fitTiles, 120); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitTiles);
 
   function tap(w){
     if(picking){

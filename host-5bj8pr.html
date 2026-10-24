@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#FFF6EC">
+<meta name="theme-color" content="#EDF7E8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Host — Find Your People</title>
 <style>
-  :root{--bg:#FFF6EC;--surface:#fff;--ink:#2B1B2E;--muted:#7A6B78;--line:#F0DFCE;
-        --pink:#FF4D8D;--purple:#A05CFF}
+  :root{--bg:#EDF7E8;--surface:#fff;--ink:#2A1E2E;--muted:#796B78;--line:#EFE4DA;
+        --pink:#FF3D8B;--purple:#9B5DE5}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);padding:0 14px 60px;
-    font-family:"Fredoka",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-family:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     font-weight:500;-webkit-text-size-adjust:100%}
   .wrap{max-width:760px;margin:0 auto}
   h1{font-size:28px;font-weight:700;margin:24px 0 4px;
@@ -28,7 +28,7 @@
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
   button{appearance:none;border:0;font:inherit;font-weight:700;
     background:linear-gradient(100deg,var(--pink),var(--purple));color:#fff;
-    padding:12px 20px;border-radius:999px;cursor:pointer;box-shadow:0 3px 0 rgba(43,27,46,.18)}
+    padding:12px 20px;border-radius:999px;cursor:pointer;box-shadow:0 3px 0 rgba(42,30,46,.18)}
   button.ghost{background:var(--surface);color:var(--muted);border:2px solid var(--line);box-shadow:none}
   button:active{transform:translateY(2px)}
   .count{color:var(--muted);font-size:15px}
@@ -45,7 +45,7 @@
   td.w{font-weight:700;font-size:17px}
   td.act{width:1%;white-space:nowrap}
   td.act button{font-size:13px;padding:12px 16px}
-  .chip{display:inline-block;padding:3px 11px;border-radius:999px;font-size:11px;font-weight:700;color:#2B1B2E}
+  .chip{display:inline-block;padding:3px 11px;border-radius:999px;font-size:11px;font-weight:700;color:#2A1E2E}
   @media (max-width:620px){
     table,thead,tbody,tr,td{display:block;width:100%}
     thead{display:none}
@@ -59,8 +59,8 @@
     td.act{grid-row:2;grid-column:2;width:auto;text-align:right}
     td.act button{padding:13px 20px;font-size:14px}
   }
-  .keycard{border-radius:18px;padding:15px 16px;margin-bottom:10px;color:#2B1B2E;
-           box-shadow:0 3px 0 rgba(43,27,46,.1)}
+  .keycard{border-radius:18px;padding:15px 16px;margin-bottom:10px;color:#2A1E2E;
+           box-shadow:0 3px 0 rgba(42,30,46,.1)}
   .keycard .n{font-weight:700;font-size:18px}
   .keycard .ws{font-size:14px;font-weight:600;opacity:.9;margin-top:4px;line-height:1.5}
   .keycard .ppl{font-size:14px;margin-top:8px;line-height:1.7;background:rgba(255,255,255,.5);
@@ -255,7 +255,7 @@
       var cc = g.color.replace("#","");
       var yiq = (parseInt(cc.substr(0,2),16)*299 + parseInt(cc.substr(2,2),16)*587 +
                  parseInt(cc.substr(4,2),16)*114) / 1000;
-      el.style.color = yiq >= 150 ? "#2B1B2E" : "#FFFFFF";
+      el.style.color = yiq >= 150 ? "#2A1E2E" : "#FFFFFF";
       var spare = {};
       UNCLAIMED.forEach(function(u){ if(u.group.id === g.id) spare[u.word] = 1; });
       el.innerHTML = '<div class="n">' + g.name + ' · ' + mem.length + ' people</div>' +

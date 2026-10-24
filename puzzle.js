@@ -8,7 +8,7 @@
    ============================================================ */
 
 window.PUZZLE = {
-  title: "Find Your People",
+  title: "Find Your Team",
 
   categories: [
     {
@@ -23,7 +23,7 @@ window.PUZZLE = {
       /* All six are things Costco sells - the pull runs both directions */
       id: "beach",
       name: "IN THE BEACH BAG",
-      color: "#35A7FF",
+      color: "#27B6F0",
       words: ["TOWEL", "SUNSCREEN", "COOLER", "SANDALS", "UMBRELLA", "FRISBEE", "CHAIR"],
     },
     {
@@ -31,14 +31,14 @@ window.PUZZLE = {
          classic money slang - only the 6-slot constraint resolves it. */
       id: "bands",
       name: "ACTUALLY BANDS",
-      color: "#A05CFF",
+      color: "#9B5DE5",
       words: ["BREAD", "GARBAGE", "CAKE", "CREAM", "PULP", "KORN", "TOTO"],
     },
     {
       /* Reads as a Costco grocery run; CLAMS reads as beach */
       id: "money",
       name: "SLANG FOR MONEY",
-      color: "#2ED9A8",
+      color: "#3FD16B",
       words: ["CLAMS", "CHEDDAR", "DOUGH", "BACON", "CABBAGE", "LETTUCE", "SCRATCH"],
     },
     {
@@ -52,7 +52,7 @@ window.PUZZLE = {
       /* Steals the two most obvious beach words; BILL and CARD pull money */
       id: "board",
       name: "___ BOARD",
-      color: "#FF4D8D",
+      color: "#FF3D8B",
       words: ["SURF", "BOOGIE", "BILL", "CARD", "SKATE", "CHALK", "DASH"],
     },
   ],
