@@ -16,14 +16,14 @@ window.PUZZLE = {
          through to money slang or bands instead. GOLD pulls toward money. */
       id: "costco",
       name: "ONLY AT COSTCO",
-      color: "#F0B429",
+      color: "#FFC928",
       words: ["GOLD", "ROTISSERIE", "CHURRO", "PALLET", "SAMPLES", "CASKET", "KIRKLAND"],
     },
     {
       /* All six are things Costco sells - the pull runs both directions */
       id: "beach",
       name: "IN THE BEACH BAG",
-      color: "#3FA7A0",
+      color: "#35A7FF",
       words: ["TOWEL", "SUNSCREEN", "COOLER", "SANDALS", "UMBRELLA", "FRISBEE", "CHAIR"],
     },
     {
@@ -31,28 +31,28 @@ window.PUZZLE = {
          classic money slang - only the 6-slot constraint resolves it. */
       id: "bands",
       name: "ACTUALLY BANDS",
-      color: "#A86FD1",
+      color: "#A05CFF",
       words: ["BREAD", "GARBAGE", "CAKE", "CREAM", "PULP", "KORN", "TOTO"],
     },
     {
       /* Reads as a Costco grocery run; CLAMS reads as beach */
       id: "money",
       name: "SLANG FOR MONEY",
-      color: "#7FB069",
+      color: "#2ED9A8",
       words: ["CLAMS", "CHEDDAR", "DOUGH", "BACON", "CABBAGE", "LETTUCE", "SCRATCH"],
     },
     {
       /* BLUE and POKER pull toward money, TORTILLA and CHOCOLATE toward Costco */
       id: "chips",
       name: "KINDS OF CHIPS",
-      color: "#5B8FD9",
+      color: "#FF8A3D",
       words: ["BLUE", "POKER", "TORTILLA", "CHOCOLATE", "WOOD", "MICRO", "PAINT"],
     },
     {
       /* Steals the two most obvious beach words; BILL and CARD pull money */
       id: "board",
       name: "___ BOARD",
-      color: "#E8795A",
+      color: "#FF4D8D",
       words: ["SURF", "BOOGIE", "BILL", "CARD", "SKATE", "CHALK", "DASH"],
     },
   ],

@@ -3,92 +3,131 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#faf7f2">
+<meta name="theme-color" content="#FFF6EC">
 <title>Find Your People</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#faf7f2; --surface:#ffffff; --tile:#efe6d9; --tile-press:#e4d7c6;
-    --ink:#1c1a17; --muted:#6c655c; --line:#ded3c4; --sel:#1c1a17; --sel-ink:#faf7f2;
+    --bg:#FFF6EC; --card:#FFFFFF; --ink:#2B1B2E; --muted:#7A6B78;
+    --line:#F0DFCE; --tile:#FFFFFF;
+    --pink:#FF4D8D; --orange:#FF8A3D; --yellow:#FFC928;
+    --mint:#2ED9A8; --sky:#35A7FF; --purple:#A05CFF;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
     background:var(--bg); color:var(--ink);
-    font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-family:"Fredoka",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-weight:500;
     -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent;
-    padding:0 14px calc(104px + env(safe-area-inset-bottom));
+    padding:0 14px calc(118px + env(safe-area-inset-bottom));
   }
-  .wrap{max-width:560px;margin:0 auto}
+  /* confetti, fixed behind everything and never under running text */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:
+      radial-gradient(circle at 6% 8%,   #FF4D8D 0 6px, transparent 7px),
+      radial-gradient(circle at 93% 14%, #35A7FF 0 7px, transparent 8px),
+      radial-gradient(circle at 18% 31%, #FFC928 0 5px, transparent 6px),
+      radial-gradient(circle at 81% 42%, #2ED9A8 0 6px, transparent 7px),
+      radial-gradient(circle at 9% 57%,  #A05CFF 0 5px, transparent 6px),
+      radial-gradient(circle at 95% 69%, #FF8A3D 0 6px, transparent 7px),
+      radial-gradient(circle at 23% 83%, #35A7FF 0 5px, transparent 6px),
+      radial-gradient(circle at 88% 92%, #FF4D8D 0 6px, transparent 7px);
+  }
+  .wrap{max-width:580px;margin:0 auto;position:relative}
 
-  header{padding:22px 2px 14px;text-align:center}
-  h1{margin:0;font-size:25px;letter-spacing:-.3px;font-weight:800}
-  .sub{margin:7px auto 0;max-width:34ch;font-size:14px;line-height:1.45;color:var(--muted)}
+  header{padding:26px 2px 16px;text-align:center}
+  h1{
+    margin:0;font-size:34px;font-weight:700;letter-spacing:-.5px;line-height:1.05;
+    background:linear-gradient(100deg,var(--pink),var(--orange) 45%,var(--purple));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{margin:10px auto 0;max-width:30ch;font-size:16px;line-height:1.4;color:var(--muted)}
 
-  /* --- your word --- */
+  /* ---------- your word ---------- */
   .mine{
-    display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;
-    background:var(--surface);border:1px solid var(--line);border-radius:14px;
-    padding:12px 14px;margin:0 0 14px;font-size:14px
+    background:var(--card);border:2px solid var(--line);border-radius:20px;
+    padding:14px 16px;margin:0 0 16px;text-align:center;
+    box-shadow:0 3px 0 rgba(43,27,46,.06)
   }
-  .mine b{font-size:17px;letter-spacing:.02em}
+  .mine .lab{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mine b{display:block;font-size:30px;font-weight:700;line-height:1.15;margin-top:3px;letter-spacing:-.3px}
   .mine button{
-    appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--muted);
-    font:inherit;font-size:13px;padding:5px 11px;border-radius:999px;cursor:pointer
+    margin-top:9px;appearance:none;border:2px solid var(--line);background:var(--bg);color:var(--muted);
+    font:inherit;font-weight:600;font-size:14px;padding:7px 16px;border-radius:999px;cursor:pointer
   }
-  .mine.prompt{background:#1c1a17;border-color:#1c1a17;color:#faf7f2;font-weight:600;justify-content:center}
-  .mine.prompt button{background:transparent;border-color:#5a564f;color:#cfc8bd}
+  .mine.prompt{
+    background:linear-gradient(100deg,var(--pink),var(--purple));border-color:transparent;
+    color:#fff;font-size:19px;font-weight:600;padding:18px 16px;
+    box-shadow:0 4px 0 rgba(43,27,46,.12)
+  }
 
-  /* --- solved teams --- */
+  /* ---------- solved teams ---------- */
   .team{
-    border-radius:14px;padding:13px 14px;margin-bottom:9px;color:#1c1a17;
-    animation:pop .32s cubic-bezier(.2,1.3,.5,1)
+    border-radius:20px;padding:16px 17px;margin-bottom:11px;
+    animation:pop .36s cubic-bezier(.2,1.35,.5,1);box-shadow:0 4px 0 rgba(43,27,46,.1)
   }
-  @keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
-  .team .label{font-size:11px;font-weight:800;letter-spacing:.1em;opacity:.65}
-  .team .name{font-size:18px;font-weight:800;margin:2px 0 5px;letter-spacing:-.2px}
-  .team .ws{font-size:13px;line-height:1.5;font-weight:600;opacity:.85}
-  .team.yours{box-shadow:0 0 0 3px var(--ink)}
+  @keyframes pop{from{transform:scale(.92) rotate(-1deg);opacity:0}to{transform:none;opacity:1}}
+  .team .label{font-size:12px;font-weight:700;letter-spacing:.14em;opacity:.7}
+  .team .name{font-size:23px;font-weight:700;margin:1px 0 7px;letter-spacing:-.3px;line-height:1.1}
+  .team .ws{font-size:15px;line-height:1.55;font-weight:600;opacity:.9}
+  .team.yours{box-shadow:0 0 0 4px var(--ink),0 4px 0 rgba(43,27,46,.1)}
 
-  /* --- grid --- */
-  #grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}
-  @media (max-width:360px){#grid{grid-template-columns:repeat(3,1fr)}}
-  @media (min-width:520px){#grid{grid-template-columns:repeat(6,1fr)}}
+  /* ---------- grid ---------- */
+  /* 3 across on a phone: fewer, bigger, easier-to-read tiles */
+  #grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+  @media (min-width:470px){#grid{grid-template-columns:repeat(4,1fr)}}
+  @media (min-width:700px){#grid{grid-template-columns:repeat(6,1fr)}}
   .tile{
-    position:relative;appearance:none;border:0;font:inherit;cursor:pointer;
-    background:var(--tile);color:var(--ink);border-radius:9px;
-    min-height:62px;padding:6px 3px;display:flex;align-items:center;justify-content:center;
-    text-align:center;font-weight:800;letter-spacing:.01em;line-height:1.08;
-    font-size:clamp(10px,3.1vw,14px);word-break:break-word;hyphens:auto;
-    transition:background .12s,transform .08s
+    position:relative;appearance:none;border:2px solid var(--line);font:inherit;cursor:pointer;
+    background:var(--tile);color:var(--ink);border-radius:16px;
+    min-height:76px;padding:8px 5px;display:flex;align-items:center;justify-content:center;
+    text-align:center;font-weight:700;line-height:1.1;letter-spacing:-.2px;
+    font-size:clamp(14px,4.3vw,19px);word-break:break-word;hyphens:auto;
+    box-shadow:0 3px 0 rgba(43,27,46,.07);
+    transition:transform .09s,box-shadow .09s,background .14s,color .14s
   }
-  .tile:active{transform:scale(.95);background:var(--tile-press)}
-  .tile.on{background:var(--sel);color:var(--sel-ink)}
+  .tile:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(43,27,46,.07)}
+  .tile.on{
+    background:linear-gradient(135deg,var(--pink),var(--purple));
+    color:#fff;border-color:transparent;
+    box-shadow:0 3px 0 rgba(43,27,46,.18)
+  }
+  .tile.me{border-color:var(--ink);border-width:3px}
   .tile.me::after{
-    content:"";position:absolute;inset:-3px;border:2.5px solid var(--ink);
-    border-radius:12px;pointer-events:none
+    content:"YOURS";position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;font-size:9px;font-weight:700;letter-spacing:.1em;
+    padding:2px 8px;border-radius:999px;white-space:nowrap
   }
-  .tile.me.on::after{border-color:#b9ad9b}
-  #grid.picking .tile{box-shadow:inset 0 0 0 1.5px rgba(28,26,23,.2)}
+  .tile.me.on{border-color:#fff}
+  .tile.me.on::after{background:#fff;color:var(--ink)}
+  /* a hint that every tile is tappable, without 36 loud outlines */
+  #grid.picking .tile{border-color:#FFC9DC}
   .shake{animation:shake .4s}
-  @keyframes shake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-4px)}}
+  @keyframes shake{10%,90%{transform:translateX(-3px)}30%,70%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
 
-  /* --- bottom bar --- */
+  /* ---------- bottom bar ---------- */
   .bar{
-    position:fixed;left:0;right:0;bottom:0;background:rgba(250,247,242,.94);
-    backdrop-filter:blur(10px);border-top:1px solid var(--line);
-    padding:11px 14px calc(11px + env(safe-area-inset-bottom));z-index:9
+    position:fixed;left:0;right:0;bottom:0;background:rgba(255,246,236,.96);
+    backdrop-filter:blur(12px);border-top:2px solid var(--line);
+    padding:13px 14px calc(13px + env(safe-area-inset-bottom));z-index:9
   }
-  .bar .inner{max-width:560px;margin:0 auto;display:flex;gap:9px;align-items:center}
-  .msg{flex:1;min-width:0;font-size:13px;line-height:1.3;color:var(--muted)}
-  .msg.hot{color:var(--ink);font-weight:700}
+  .bar .inner{max-width:580px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  .msg{flex:1;min-width:0;font-size:15px;line-height:1.3;color:var(--muted);font-weight:500}
+  .msg.hot{color:var(--ink);font-weight:600}
   .btn{
-    appearance:none;border:0;font:inherit;font-weight:800;font-size:15px;
-    padding:12px 18px;border-radius:999px;cursor:pointer;white-space:nowrap
+    appearance:none;border:0;font:inherit;font-weight:700;font-size:17px;
+    padding:14px 24px;border-radius:999px;cursor:pointer;white-space:nowrap;
+    box-shadow:0 3px 0 rgba(43,27,46,.18)
   }
-  .btn.go{background:var(--ink);color:var(--bg)}
-  .btn.go[disabled]{background:#ded3c4;color:#8d8679;cursor:default}
-  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);padding:11px 14px}
-  footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 4px}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(43,27,46,.18)}
+  .btn.go{background:linear-gradient(100deg,var(--pink),var(--purple));color:#fff}
+  .btn.go[disabled]{background:#EADCCB;color:#A99A8B;box-shadow:none;transform:none;cursor:default}
+  .btn.ghost{background:var(--card);color:var(--muted);border:2px solid var(--line);padding:12px 16px;font-size:15px}
+  footer{text-align:center;color:var(--muted);font-size:14px;font-weight:500;padding:22px 0 6px}
 </style>
 </head>
 <body>
@@ -144,6 +183,14 @@
   document.getElementById("title").textContent = PUZZLE.title;
   document.title = PUZZLE.title;
 
+  /* The category colours are deliberately bright, so pick each card's text
+     colour from its background rather than assuming dark ink reads on all. */
+  function inkOn(hex){
+    var c = hex.replace("#","");
+    var r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+    return ((r*299 + g*587 + b*114) / 1000) >= 150 ? "#2B1B2E" : "#FFFFFF";
+  }
+
   function solvedWords(){
     var out = {};
     state.solved.forEach(function(id){
@@ -173,14 +220,14 @@
     var done = solvedWords();
     var mg = myGroup();
 
-    /* your-word strip */
+    /* your-word card */
     if(picking){
       $mine.className = "mine prompt";
-      $mine.innerHTML = "👇 Tap your word below to get started";
+      $mine.innerHTML = "🎉 Tap your word below to start";
     } else {
       $mine.className = "mine";
-      $mine.innerHTML = '<span>Your word</span><b>' + state.mine + '</b>' +
-        '<button id="rp">change</button>';
+      $mine.innerHTML = '<div class="lab">Your word</div><b>' + state.mine + '</b>' +
+        '<button id="rp">not mine — change</button>';
       document.getElementById("rp").onclick = function(){
         picking = true; sel = []; render();
       };
@@ -195,7 +242,8 @@
       var el = document.createElement("div");
       el.className = "team" + (mineHere ? " yours" : "");
       el.style.background = g.color;
-      el.innerHTML = '<div class="label">' + (mineHere ? "YOUR TEAM" : "TEAM") + '</div>' +
+      el.style.color = inkOn(g.color);
+      el.innerHTML = '<div class="label">' + (mineHere ? "🎈 YOUR TEAM" : "TEAM") + '</div>' +
                      '<div class="name">' + g.name + '</div>' +
                      '<div class="ws">' + g.words.join(" · ") + '</div>';
       $teams.appendChild(el);
@@ -214,7 +262,7 @@
       b.onclick = function(){ tap(w); };
       $grid.appendChild(b);
     });
-    if(!remaining) $grid.style.display = "none"; else $grid.style.display = "";
+    $grid.style.display = remaining ? "" : "none";
 
     /* bar */
     var target = mg ? TEAM_SIZE_BY_ID[mg.id] : maxOpen();
@@ -225,7 +273,7 @@
       $msg.className = "msg hot";
       $check.disabled = true;
     } else if(mg && state.solved.indexOf(mg.id) > -1){
-      $msg.innerHTML = "You're on <b>" + mg.name + "</b> — go find them.";
+      $msg.innerHTML = "You're on <b>" + mg.name + "</b> — go find them!";
       $msg.className = "msg hot";
     } else {
       $msg.textContent = sel.length
@@ -280,6 +328,7 @@
     $grid.classList.add("shake");
     setTimeout(function(){ $grid.classList.remove("shake"); }, 420);
     render();
+
     /* Only the classic "one away" is worth saying out loud. An exact count
        on every miss turns the board into a solver and kills the puzzle. */
     $msg.textContent = (best === sel.length - 1)
