@@ -10,6 +10,17 @@ Find the words that belong with yours — the people holding them are your team.
 Share **one link** with everyone. Each guest types their first name
 (case-insensitive, first name only) and the board hands them their word.
 
+The game runs in two phases:
+
+1. **Solve your category.** Which six words go with yours? Pure
+   Connections - a few minutes.
+2. **Find your people.** Enter each teammate's name as you track them
+   down. This is the part that takes the time: you have to work the room
+   asking what people's words are. With ~33 guests it runs 20+ minutes.
+
+Teammates come from `roster.js`, not from the word list, so the three
+unclaimed spare words never become phantom people to hunt for.
+
 `/host-5bj8pr.html` is the host page: it holds the answer key, the full
 name-to-word list, and a ready-to-send text per person as a backup for
 anyone who can't find themselves.

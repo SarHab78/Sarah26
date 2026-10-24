@@ -88,6 +88,122 @@
     box-shadow:0 4px 0 rgba(42,30,46,.12)
   }
 
+  /* ---------- phase 2: hunt for your people ---------- */
+  var $hunt = document.getElementById("hunt"), $bar = document.querySelector(".bar");
+
+  function myTeammates(){
+    var mg = myGroup();
+    if(!mg) return [];
+    return PEOPLE.filter(function(p){
+      return p.groupId === mg.id && p.word !== state.mine;
+    });
+  }
+
+  var peeking = false;
+
+  function renderHunt(){
+    var mg = myGroup();
+    var mates = myTeammates();
+    var inHunt = mg && state.solved.indexOf(mg.id) > -1 && mates.length > 0;
+
+    if(!inHunt){
+      $hunt.classList.add("hide");
+      $grid.classList.remove("hide");
+      $bar.classList.remove("hide");
+      return;
+    }
+
+    var found = state.found.filter(function(w){
+      return mates.some(function(m){ return m.word === w; });
+    });
+    var complete = found.length === mates.length;
+
+    /* once you are hunting, the grid is noise - keep it one tap away */
+    $grid.classList.toggle("hide", !peeking);
+    $bar.classList.toggle("hide", !peeking);
+    $hunt.classList.remove("hide");
+
+    if(complete){
+      $hunt.className = "done";
+      $hunt.innerHTML =
+        "<h2>🎉 Team complete!</h2>" +
+        '<div class="time">' + mg.name + "</div><ul>" +
+        [{display: state.name || "You", word: state.mine}].concat(mates).map(function(p){
+          return "<li>" + p.display + "<span>" + p.word + "</span></li>";
+        }).join("") +
+        "</ul>";
+      return;
+    }
+
+    $hunt.className = "hunt";
+    $hunt.innerHTML =
+      "<h2>Now go find them</h2>" +
+      '<div class="prog">' + found.length + " of " + mates.length +
+        " found · go ask people what their word is</div>" +
+      '<form id="huntform" autocomplete="off">' +
+        '<input id="mate" type="text" autocapitalize="words" autocorrect="off" ' +
+               'spellcheck="false" placeholder="Their first name">' +
+        '<button type="submit" class="add">Add</button>' +
+      "</form>" +
+      '<div class="slots">' +
+        mates.map(function(m){
+          var got = found.indexOf(m.word) > -1;
+          return '<div class="slot' + (got ? " got" : "") + '"' +
+                 (got ? ' style="background:' + mg.color + ';color:' + inkOn(mg.color) + '"' : "") +
+                 '><span class="w">' + m.word + '</span>' +
+                 '<span class="n">' + (got ? m.display : "who has this?") + "</span></div>";
+        }).join("") +
+      "</div>" +
+      '<p class="say" id="huntsay"></p>' +
+      '<button class="peek" id="peek">' + (peeking ? "hide the board" : "peek at the board") + "</button>";
+
+    document.getElementById("peek").onclick = function(){ peeking = !peeking; render(); };
+
+    document.getElementById("huntform").onsubmit = function(e){
+      e.preventDefault();
+      var $mate = document.getElementById("mate"), $say = document.getElementById("huntsay");
+      var raw = ($mate.value || "").trim();
+      if(!raw) return;
+      var q = raw.split(/\s+/)[0].toLowerCase();
+      var hit = PEOPLE.filter(function(p){ return p.first === q; });
+
+      if(!hit.length){
+        $say.className = "say bad";
+        $say.textContent = "No " + raw + " here — check the spelling?";
+        return;
+      }
+      if(hit.length > 1){
+        $say.className = "say bad";
+        $say.textContent = "There's more than one " + hit[0].display + " — ask Sarah.";
+        return;
+      }
+      var who = hit[0];
+      if(who.word === state.mine){
+        $say.className = "say bad";
+        $say.textContent = "That's you!";
+        return;
+      }
+      if(state.found.indexOf(who.word) > -1){
+        $say.className = "say";
+        $say.textContent = "You already found " + who.display + ".";
+        $mate.value = "";
+        return;
+      }
+      if(who.groupId !== mg.id){
+        $say.className = "say bad";
+        $say.textContent = who.display + " isn't on your team. Keep looking!";
+        $mate.value = "";
+        return;
+      }
+      state.found.push(who.word);
+      save();
+      $mate.value = "";
+      render();
+      var s2 = document.getElementById("huntsay");
+      if(s2){ s2.className = "say good"; s2.textContent = "Got " + who.display + "!"; }
+    };
+  }
+
   /* ---------- name gate ---------- */
   .gate{
     background:var(--card);border:2px solid var(--line);border-radius:20px;
@@ -114,7 +230,43 @@
   .gate p b{color:var(--ink)}
   .gate .alt{background:none;border:0;color:var(--muted);font:inherit;font-size:15px;
              font-weight:600;text-decoration:underline;cursor:pointer;padding:0;box-shadow:none}
-  .hide{display:none}
+  /* beats #grid's own display rule - an id outranks a bare class */
+  .hide{display:none !important}
+
+  /* ---------- phase 2: hunt for your people ---------- */
+  .hunt{background:var(--card);border:2px solid var(--line);border-radius:20px;
+        padding:17px 16px;margin:0 0 14px;box-shadow:0 3px 0 rgba(42,30,46,.06)}
+  .hunt h2{margin:0 0 3px;font-size:21px;font-weight:700;letter-spacing:-.3px}
+  .hunt .prog{font-size:15px;color:var(--muted);font-weight:600;margin-bottom:13px}
+  .hunt form{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+  .hunt input{flex:1 1 140px;min-width:0;font:inherit;font-size:17px;font-weight:600;
+    padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:var(--bg);color:var(--ink)}
+  .hunt input:focus{outline:none;border-color:var(--pink)}
+  .hunt .add{appearance:none;border:0;font:inherit;font-weight:700;font-size:16px;color:#fff;
+    padding:12px 20px;border-radius:999px;cursor:pointer;
+    background:linear-gradient(95deg,var(--pink),var(--purple));box-shadow:0 3px 0 rgba(42,30,46,.18)}
+  .hunt .add:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(42,30,46,.18)}
+  .slots{display:flex;flex-direction:column;gap:8px}
+  .slot{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:14px;
+        background:var(--bg);border:2px dashed var(--line)}
+  .slot.got{border-style:solid;border-color:transparent}
+  .slot .w{font-weight:700;font-size:16px;letter-spacing:-.2px}
+  .slot .n{margin-left:auto;font-weight:600;font-size:16px;color:var(--muted)}
+  .slot.got .n{color:inherit}
+  .hunt .say{margin:12px 0 0;font-size:15px;line-height:1.45;font-weight:600;color:var(--muted)}
+  .hunt .say.bad{color:#C0392B}
+  .hunt .say.good{color:#1F8A4C}
+  .hunt .peek{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;
+    font-weight:600;text-decoration:underline;cursor:pointer;padding:0;margin-top:13px;box-shadow:none}
+  .done{background:linear-gradient(95deg,var(--pink),var(--orange) 50%,var(--purple));
+        color:#fff;border-radius:20px;padding:20px 17px;margin:0 0 14px;text-align:center;
+        box-shadow:0 4px 0 rgba(42,30,46,.14)}
+  .done h2{margin:0 0 4px;font-size:26px;font-weight:700}
+  .done .time{font-size:16px;font-weight:600;opacity:.9}
+  .done ul{list-style:none;margin:14px 0 0;padding:0;text-align:left}
+  .done li{background:rgba(255,255,255,.2);border-radius:12px;padding:9px 13px;margin-bottom:7px;
+           font-weight:600;font-size:16px;display:flex;gap:10px}
+  .done li span{margin-left:auto;opacity:.85}
 
   /* ---------- solved teams ---------- */
   .team{
@@ -203,6 +355,7 @@
 
   <div id="mine" class="mine prompt"></div>
   <div id="teams"></div>
+  <div id="hunt" class="hunt hide"></div>
   <div id="grid"></div>
   <footer id="foot"></footer>
 </div>
@@ -241,8 +394,9 @@
   function load(){
     try{
       var s = JSON.parse(localStorage.getItem(KEY) || "{}");
-      return { mine: s.mine || null, name: s.name || null, solved: s.solved || [], guesses: s.guesses || 0 };
-    }catch(e){ return { mine:null, name:null, solved:[], guesses:0 }; }
+      return { mine: s.mine || null, name: s.name || null, solved: s.solved || [],
+               guesses: s.guesses || 0, found: s.found || [] };
+    }catch(e){ return { mine:null, name:null, solved:[], guesses:0, found:[] }; }
   }
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 
@@ -287,6 +441,27 @@
       .slice(0,3)
       .map(function(x){ return BY_NAME[x.k].display; });
   }
+
+  /* Everyone on the roster, flattened with the word they actually hold.
+     Teammates are derived from PEOPLE, not from the word list, so the three
+     unclaimed spare words never become phantom teammates to hunt for. */
+  var PEOPLE = (function(){
+    if(!window.ROSTER || !ROSTER.teams) return [];
+    var byId = {}, out = [];
+    PUZZLE.activeGroups(N).forEach(function(g){ byId[g.id] = g; });
+    ROSTER.teams.forEach(function(t){
+      var g = byId[t.categoryId];
+      if(!g) return;
+      t.people.forEach(function(person, i){
+        if(i >= g.words.length) return;
+        var nm = String(person).trim();
+        out.push({ first: nm.split(/\s+/)[0].toLowerCase(),
+                   display: nm.split(/\s+/)[0],
+                   word: g.words[i], groupId: g.id });
+      });
+    });
+    return out;
+  })();
 
   var picking = !state.mine;
   var sel = [];
@@ -408,9 +583,19 @@
       $msg.className = "msg";
     }
     renderGate();
-    $foot.textContent = state.guesses
-      ? state.solved.length + " of " + GROUPS.length + " teams found · " + state.guesses + " guess" + (state.guesses===1?"":"es")
-      : state.solved.length + " of " + GROUPS.length + " teams found";
+    renderHunt();
+    /* Once you're hunting, your own progress matters more than the board's. */
+    var mates = myTeammates();
+    if(mg && state.solved.indexOf(mg.id) > -1 && mates.length){
+      var got = state.found.filter(function(w){
+        return mates.some(function(m){ return m.word === w; });
+      }).length;
+      $foot.textContent = got + " of " + mates.length + " teammates found";
+    } else {
+      $foot.textContent = state.guesses
+        ? state.solved.length + " of " + GROUPS.length + " teams found · " + state.guesses + " guess" + (state.guesses===1?"":"es")
+        : state.solved.length + " of " + GROUPS.length + " teams found";
+    }
   }
 
   /* CHOCOLATE and ROTISSERIE are wider than a tile at the base size, and a
@@ -456,6 +641,122 @@
       sel.push(w);
     }
     render();
+  }
+
+  /* ---------- phase 2: hunt for your people ---------- */
+  var $hunt = document.getElementById("hunt"), $bar = document.querySelector(".bar");
+
+  function myTeammates(){
+    var mg = myGroup();
+    if(!mg) return [];
+    return PEOPLE.filter(function(p){
+      return p.groupId === mg.id && p.word !== state.mine;
+    });
+  }
+
+  var peeking = false;
+
+  function renderHunt(){
+    var mg = myGroup();
+    var mates = myTeammates();
+    var inHunt = mg && state.solved.indexOf(mg.id) > -1 && mates.length > 0;
+
+    if(!inHunt){
+      $hunt.classList.add("hide");
+      $grid.classList.remove("hide");
+      $bar.classList.remove("hide");
+      return;
+    }
+
+    var found = state.found.filter(function(w){
+      return mates.some(function(m){ return m.word === w; });
+    });
+    var complete = found.length === mates.length;
+
+    /* once you are hunting, the grid is noise - keep it one tap away */
+    $grid.classList.toggle("hide", !peeking);
+    $bar.classList.toggle("hide", !peeking);
+    $hunt.classList.remove("hide");
+
+    if(complete){
+      $hunt.className = "done";
+      $hunt.innerHTML =
+        "<h2>🎉 Team complete!</h2>" +
+        '<div class="time">' + mg.name + "</div><ul>" +
+        [{display: state.name || "You", word: state.mine}].concat(mates).map(function(p){
+          return "<li>" + p.display + "<span>" + p.word + "</span></li>";
+        }).join("") +
+        "</ul>";
+      return;
+    }
+
+    $hunt.className = "hunt";
+    $hunt.innerHTML =
+      "<h2>Now go find them</h2>" +
+      '<div class="prog">' + found.length + " of " + mates.length +
+        " found · go ask people what their word is</div>" +
+      '<form id="huntform" autocomplete="off">' +
+        '<input id="mate" type="text" autocapitalize="words" autocorrect="off" ' +
+               'spellcheck="false" placeholder="Their first name">' +
+        '<button type="submit" class="add">Add</button>' +
+      "</form>" +
+      '<div class="slots">' +
+        mates.map(function(m){
+          var got = found.indexOf(m.word) > -1;
+          return '<div class="slot' + (got ? " got" : "") + '"' +
+                 (got ? ' style="background:' + mg.color + ';color:' + inkOn(mg.color) + '"' : "") +
+                 '><span class="w">' + (got ? m.word : "? ? ?") + '</span>' +
+                 '<span class="n">' + (got ? m.display : "not found yet") + "</span></div>";
+        }).join("") +
+      "</div>" +
+      '<p class="say" id="huntsay"></p>' +
+      '<button class="peek" id="peek">' + (peeking ? "hide the board" : "peek at the board") + "</button>";
+
+    document.getElementById("peek").onclick = function(){ peeking = !peeking; render(); };
+
+    document.getElementById("huntform").onsubmit = function(e){
+      e.preventDefault();
+      var $mate = document.getElementById("mate"), $say = document.getElementById("huntsay");
+      var raw = ($mate.value || "").trim();
+      if(!raw) return;
+      var q = raw.split(/\s+/)[0].toLowerCase();
+      var hit = PEOPLE.filter(function(p){ return p.first === q; });
+
+      if(!hit.length){
+        $say.className = "say bad";
+        $say.textContent = "No " + raw + " here — check the spelling?";
+        return;
+      }
+      if(hit.length > 1){
+        $say.className = "say bad";
+        $say.textContent = "There's more than one " + hit[0].display + " — ask Sarah.";
+        return;
+      }
+      var who = hit[0];
+      if(who.word === state.mine){
+        $say.className = "say bad";
+        $say.textContent = "That's you!";
+        return;
+      }
+      if(state.found.indexOf(who.word) > -1){
+        $say.className = "say";
+        $say.textContent = "You already found " + who.display + ".";
+        $mate.value = "";
+        return;
+      }
+      if(who.groupId !== mg.id){
+        $say.className = "say bad";
+        $say.textContent = who.display + " isn't on your team. Keep looking!";
+        $mate.value = "";
+        return;
+      }
+      state.found.push(who.word);
+      save();
+      $mate.value = "";
+      render();
+      var s2 = document.getElementById("huntsay");
+      if(s2){ s2.className = "say good"; s2.textContent = "Got " + who.display + "!"; }
+    };
   }
 
   /* ---------- name gate ---------- */
